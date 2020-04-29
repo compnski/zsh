@@ -70,6 +70,14 @@ ZSH_CUSTOM="${HOME}/.zsh"
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(jason zsh-nvm)
 
+
+
+# ###############
+# #### NVM   ####
+# ###############
+export NVM_LAZY_LOAD=true
+
+
 source $ZSH/oh-my-zsh.sh
 
 # User configuration
