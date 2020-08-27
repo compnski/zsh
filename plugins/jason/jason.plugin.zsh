@@ -1,8 +1,13 @@
 export CLICOLOR=1
-export EDITOR="subl -w"
+export EDITOR="emacsclient -t"
 #export LSCOLORS=GxFxCxDxBxegedabagaced
 #export PAGER=less
 #export LESS="-iMSx4 -FX"
+
+#alias e='emacsclient -t'
+alias ec='emacsclient -c'
+alias vim='emacsclient -t'
+alias vi='emacsclient -t'
 
 
 # enable color support of ls
@@ -90,12 +95,77 @@ settitle() {
 }
 
 
+###################
+#### NVM + RVM ####
+###################
+# when cd'ing into a directory with an .nvmrc, initialize nvm for that version specified in .nvmrc
+load-nvmrc() {
+  [[ -a .nvmrc ]] || return # if the directoy doesn't have an .nvmrc, return early
+  export NVM_DIR="$HOME/.nvm"
+  echo "loading nvm"
+  [ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh"  # This loads nvm
+  local node_version="$(nvm version)"
+  local nvmrc_path="$(nvm_find_nvmrc)"
+  if [ -n "$nvmrc_path" ]; then
+    local nvmrc_node_version=$(nvm version "$(cat "${nvmrc_path}")")
+    if [ "$nvmrc_node_version" = "N/A" ]; then
+      nvm install
+    elif [ "$nvmrc_node_version" != "$node_version" ]; then
+      nvm use
+    fi
+  elif [ "$node_version" != "$(nvm version default)" ]; then
+    echo "Reverting to nvm default version"
+    nvm use default
+  fi
+}
+# load rvm when there is a Gemfile present
+load-rvm() {
+  [[ -a Gemfile ]] || return # if the directoy doesn't have an Gemfile, return early
+  LC_ALL=C type rvm > /dev/null || (echo "loading rvm..." && source /etc/profile.d/rvm.sh)
+}
+
+
+# autoload -U add-zsh-hook
+# add-zsh-hook chpwd load-nvmrc
+# add-zsh-hook chpwd load-rvm
+
+
+lazynvm() {
+  local -r cmd="${1}"
+  [[ -n "${1}" ]] && unset -f "${1}"
+  ([[ -z "$NVM_DIR" ]] && export NVM_DIR="$HOME/.nvm") || return
+  [ -s "/usr/local/opt/nvm/nvm.sh" ] && . "/usr/local/opt/nvm/nvm.sh"  # This loads nvm
+}
+
+###################
+#### NVM + RVM ####
+###################
+
+nvm() {
+  lazynvm nvm
+  nvm $@
+}
+node() {
+  lazynvm node
+  node $@
+}
+npm() {
+  lazynvm npm
+  npm $@
+}
+npx() {
+  lazynvm npx
+  npx $@
+}
+
+  
+
+
 ##################
 #### ALIASES   ####
 ###################
 alias e='subl'
 alias ec='subl -w'
-alias emacsclient="/usr/local/Cellar/emacs/24.3/bin/emacsclient"
 alias fastcop='git diff --name-only HEAD | xargs rubocop -a'
 alias fr='foreman run -f ~/src/clocktower/Procfile -e /Users/jason/src/clocktower/development.env'
 alias frc='fr spring rails console'
@@ -110,3 +180,13 @@ alias la='ls -a'
 alias ll='ls -l'
 alias ls='ls --color=auto'
 alias psql='psql -eL /tmp/psql.log'
+alias glc='golangci-lint run \
+          --no-config \
+          --presets bugs,format,style,unused \
+          --out-format=tab \
+          -D goimports \
+          -D lll \
+          -D megacheck \
+          -D gofmt \
+          -D golint \
+          -D typecheck'

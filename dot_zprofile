@@ -13,16 +13,17 @@ export HOMEBREW_GITHUB_API_TOKEN=`cat ~/.github_homebrew_token`
 #################
 
 # Overrides
-PATH="/usr/local/opt/coreutils/libexec/gnubin:$PATH"
 PATH="$(python3 -m site --user-base)/bin:${PATH}"
+PATH="/usr/local/opt/coreutils/libexec/gnubin:$PATH"
 PATH="$JAVA_HOME/bin:$PATH"
-
+PATH="/usr/local/opt/texinfo/bin:$PATH"
 # Additions
 PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
 PATH="$PATH:$HOME/bin"
 PATH="$PATH:$GOBIN"
 PATH="$PATH:$HOME/src/clocktower/scripts/kube/"
-
+PATH="$PATH:/Applications/Emacs.app/Contents/Resources/bin"
+PATH="$PATH:$HOME/.emacs.d/bin"
 # Remove duplicates from path
 typeset -U PATH
 
