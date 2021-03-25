@@ -70,6 +70,17 @@ function editin() {
   edit -c "$@"
 }
 
+#######################
+#### SUDO Touchbar ####
+#######################
+sudo() {
+  unset -f sudo
+  if [[ "$(uname)" == 'Darwin' ]] && ! grep 'pam_tid.so' /etc/pam.d/sudo --silent; then
+  sudo /usr/bin/sed -i -e '1s;^;auth       sufficient     pam_tid.so\;' /etc/pam.d/sudo
+  fi
+  sudo "$@"
+}
+
 
 ########################
 #### KEY BINDINGS   ####
@@ -95,29 +106,6 @@ settitle() {
 }
 
 
-###################
-#### NVM + RVM ####
-###################
-# when cd'ing into a directory with an .nvmrc, initialize nvm for that version specified in .nvmrc
-load-nvmrc() {
-  [[ -a .nvmrc ]] || return # if the directoy doesn't have an .nvmrc, return early
-  export NVM_DIR="$HOME/.nvm"
-  echo "loading nvm"
-  [ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh"  # This loads nvm
-  local node_version="$(nvm version)"
-  local nvmrc_path="$(nvm_find_nvmrc)"
-  if [ -n "$nvmrc_path" ]; then
-    local nvmrc_node_version=$(nvm version "$(cat "${nvmrc_path}")")
-    if [ "$nvmrc_node_version" = "N/A" ]; then
-      nvm install
-    elif [ "$nvmrc_node_version" != "$node_version" ]; then
-      nvm use
-    fi
-  elif [ "$node_version" != "$(nvm version default)" ]; then
-    echo "Reverting to nvm default version"
-    nvm use default
-  fi
-}
 # load rvm when there is a Gemfile present
 load-rvm() {
   [[ -a Gemfile ]] || return # if the directoy doesn't have an Gemfile, return early
@@ -126,39 +114,7 @@ load-rvm() {
 
 
 # autoload -U add-zsh-hook
-# add-zsh-hook chpwd load-nvmrc
 # add-zsh-hook chpwd load-rvm
-
-
-lazynvm() {
-  local -r cmd="${1}"
-  [[ -n "${1}" ]] && unset -f "${1}"
-  ([[ -z "$NVM_DIR" ]] && export NVM_DIR="$HOME/.nvm") || return
-  [ -s "/usr/local/opt/nvm/nvm.sh" ] && . "/usr/local/opt/nvm/nvm.sh"  # This loads nvm
-}
-
-###################
-#### NVM + RVM ####
-###################
-
-nvm() {
-  lazynvm nvm
-  nvm $@
-}
-node() {
-  lazynvm node
-  node $@
-}
-npm() {
-  lazynvm npm
-  npm $@
-}
-npx() {
-  lazynvm npx
-  npx $@
-}
-
-  
 
 
 ##################

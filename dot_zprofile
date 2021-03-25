@@ -6,6 +6,7 @@ export JAVA_HOME="$(/usr/libexec/java_home)"
 export GOBIN="$HOME/src/clocktower/bin/go"
 # homebrew runs out of git quota, use my personal token
 export HOMEBREW_GITHUB_API_TOKEN=`cat ~/.github_homebrew_token`
+export VOLTA_HOME="$HOME/.volta"
 
 
 #################
@@ -24,12 +25,17 @@ PATH="$PATH:$GOBIN"
 PATH="$PATH:$HOME/src/clocktower/scripts/kube/"
 PATH="$PATH:/Applications/Emacs.app/Contents/Resources/bin"
 PATH="$PATH:$HOME/.emacs.d/bin"
+PATH="$VOLTA_HOME/bin:$PATH"
+
 # Remove duplicates from path
 typeset -U PATH
-
+export PATH
 
 ###############
 #### RVM   ####
 ###############
 # Load RVM into a shell session *as a function*
 [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm"
+
+CLOCKTOWER_ROOT=/Users/jason/src/clocktower
+export CLOCKTOWER_ROOT
